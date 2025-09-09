@@ -1,0 +1,253 @@
+<UserControl x:Class="GameTableManagerPro.Views.HealthMonitorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:GameTableManagerPro.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=viewModels:HealthMonitorViewModel}">
+    
+    <UserControl.Resources>
+        <!-- Styles -->
+        <Style x:Key="HealthCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF252526"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <Style x:Key="AlertCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF252526"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,5"/>
+        </Style>
+        
+        <Style x:Key="LogEntryStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF1E1E1E"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+        
+        <!-- Converters -->
+        <viewModels:HealthStatusToBrushConverter x:Key="HealthStatusToBrushConverter"/>
+        <viewModels:AlertSeverityToBrushConverter x:Key="AlertSeverityToBrushConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Loading Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Panel.ZIndex="1000">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20" Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="White" TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20">
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <TextBlock Text="❤️ Health Monitoring" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                    <Button Content="🔄 Refresh" Command="{Binding LoadMonitoringDataCommand}" 
+                            Margin="20,0,0,0" Padding="10,5" Style="{StaticResource ToolButtonStyle}"/>
+                </StackPanel>
+
+                <!-- Control Panel -->
+                <Border Style="{StaticResource HealthCardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="MONITORING CONTROLS" Foreground="#FF007ACC" FontWeight="Bold" Margin="0,0,0,10"/>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding IsMonitoringActive, Converter={StaticResource MonitoringToggleConverter}}"
+                                    Command="{Binding ToggleMonitoringCommand}" 
+                                    Padding="15,8" 
+                                    Background="{Binding IsMonitoringActive, Converter={StaticResource MonitoringButtonConverter}}"
+                                    Foreground="White" FontWeight="Bold"/>
+                            
+                            <Button Content="🩺 Manual Check" Command="{Binding RunManualHealthCheckCommand}" 
+                                    Margin="10,0,0,0" Padding="15,8" Style="{StaticResource ToolButtonStyle}"/>
+                                    
+                            <Button Content="🧹 Clear Results" Command="{Binding ClearHealthResultsCommand}" 
+                                    Margin="10,0,0,0" Padding="15,8" Style="{StaticResource ToolButtonStyle}"/>
+                                    
+                            <TextBlock Text="{Binding StatusMessage}" Foreground="#FFCCCCCC" Margin="20,0,0,0"
+                                       VerticalAlignment="Center" FontSize="12"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <TextBlock Text="Check Interval:" Foreground="#FFCCCCCC" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox SelectedItem="{Binding CheckIntervalSeconds}" Width="80">
+                                <ComboBoxItem Content="30 seconds"/>
+                                <ComboBoxItem Content="60 seconds" IsSelected="True"/>
+                                <ComboBoxItem Content="120 seconds"/>
+                                <ComboBoxItem Content="300 seconds"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Health Overview Grid -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Total Tables -->
+                    <Border Style="{StaticResource HealthCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Total Tables" Foreground="#FFCCCCCC" FontSize="12"/>
+                            <TextBlock Text="{Binding SystemHealthMetrics.TotalTables}" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock Text="Systems" Foreground="#FFCCCCCC" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Healthy Tables -->
+                    <Border Style="{StaticResource HealthCardStyle}" Grid.Column="1">
+                        <StackPanel>
+                            <TextBlock Text="Healthy" Foreground="#FFCCCCCC" FontSize="12"/>
+                            <TextBlock Text="{Binding SystemHealthMetrics.HealthyTables}" Foreground="#FF4CAF50" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding SystemHealthMetrics.HealthPercentage, StringFormat='{}{0:F1}%'}" 
+                                       Foreground="#FF4CAF50" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Warning Tables -->
+                    <Border Style="{StaticResource HealthCardStyle}" Grid.Column="2">
+                        <StackPanel>
+                            <TextBlock Text="Warnings" Foreground="#FFCCCCCC" FontSize="12"/>
+                            <TextBlock Text="{Binding SystemHealthMetrics.WarningTables}" Foreground="#FFFF9800" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock Text="Need attention" Foreground="#FFFF9800" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Error Tables -->
+                    <Border Style="{StaticResource HealthCardStyle}" Grid.Column="3">
+                        <StackPanel>
+                            <TextBlock Text="Errors" Foreground="#FFCCCCCC" FontSize="12"/>
+                            <TextBlock Text="{Binding SystemHealthMetrics.ErrorTables}" Foreground="#FFF44336" FontSize="24" FontWeight="Bold"/>
+                            <TextBlock Text="Critical issues" Foreground="#FFF44336" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Main Content Grid -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Active Alerts -->
+                    <Border Style="{StaticResource HealthCardStyle}" Margin="0,0,10,0">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="🚨 ACTIVE ALERTS" Foreground="#FF007ACC" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding ActiveAlerts.Count, StringFormat='{}({0})'}" Foreground="#FFCCCCCC" Margin="5,0,0,0"/>
+                                
+                                <Button Content="Acknowledge All" Command="{Binding AcknowledgeAllAlertsCommand}" 
+                                        Margin="10,0,0,0" Padding="5,2" FontSize="11" Style="{StaticResource ToolButtonStyle}"
+                                        Visibility="{Binding ActiveAlerts.Count, Converter={StaticResource CountToVisibilityConverter}}"/>
+                            </StackPanel>
+                            
+                            <ItemsControl ItemsSource="{Binding ActiveAlerts}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource AlertCardStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Message}" Foreground="{Binding Severity, Converter={StaticResource AlertSeverityToBrushConverter}}"
+                                                               FontWeight="Bold" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding Timestamp, StringFormat='{}at {0:HH:mm:ss}'}" Foreground="#FFCCCCCC" FontSize="11"/>
+                                                </StackPanel>
+                                                
+                                                <Button Content="✓" Command="{Binding DataContext.AcknowledgeAlertCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}" Grid.Column="1" Padding="8,2" FontSize="11"
+                                                        Style="{StaticResource ToolButtonStyle}" ToolTip="Acknowledge alert"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            
+                            <TextBlock Text="No active alerts" Foreground="#FFCCCCCC" FontStyle="Italic" HorizontalAlignment="Center" Margin="0,20"
+                                       Visibility="{Binding ActiveAlerts.Count, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter=Reverse}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Health Check Results -->
+                    <Border Style="{StaticResource HealthCardStyle}" Grid.Column="1" Margin="10,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="📊 HEALTH CHECK HISTORY" Foreground="#FF007ACC" FontWeight="Bold" Margin="0,0,0,10"/>
+                            
+                            <ScrollViewer MaxHeight="300">
+                                <ItemsControl ItemsSource="{Binding HealthCheckResults}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource LogEntryStyle}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Timestamp, StringFormat='{}[HH:mm:ss] '}" Foreground="#FFCCCCCC" FontSize="11"/>
+                                                    <TextBlock Text="{Binding Message}" Foreground="{Binding Status, Converter={StaticResource HealthStatusToBrushConverter}}" 
+                                                               FontSize="11" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding TableName, StringFormat='{} ({0})'}" Foreground="#FF888888" FontSize="11"
+                                                               Visibility="{Binding TableName, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            
+                            <TextBlock Text="No health check results" Foreground="#FFCCCCCC" FontStyle="Italic" HorizontalAlignment="Center" Margin="0,10"
+                                       Visibility="{Binding HealthCheckResults.Count, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter=Reverse}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Monitored Tables -->
+                <Border Style="{StaticResource HealthCardStyle}" Margin="0,20,0,0">
+                    <StackPanel>
+                        <TextBlock Text="🖥️ MONITORED TABLES" Foreground="#FF007ACC" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding MonitoredTables.Count, StringFormat='{}Monitoring {0} tables'}" Foreground="#FFCCCCCC" Margin="0,0,0,10"/>
+                        
+                        <ItemsControl ItemsSource="{Binding MonitoredTables}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource AlertCardStyle}" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Hostname}" Foreground="White" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding IPAddress}" Foreground="#FFCCCCCC" FontSize="11"/>
+                                                <TextBlock Text="{Binding Status}" Foreground="{Binding Status, Converter={StaticResource StatusToBrushConverter}}" FontSize="11"/>
+                                                <TextBlock Text="{Binding LastSeen, StringFormat='{}Last seen: {0:g}'}" Foreground="#FF888888" FontSize="11"/>
+                                            </StackPanel>
+                                            
+                                            <Button Content="🔍 Check" Command="{Binding DataContext.CheckSingleTableCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Grid.Column="1" Padding="5,2" FontSize="11"
+                                                    Style="{StaticResource ToolButtonStyle}" ToolTip="Check this table's health"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

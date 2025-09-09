@@ -59,15 +59,8 @@ public partial class MainWindow : Window
                 break;
                 
             case "HealthMonitoring":
-                // Placeholder for health monitoring view
-                MainContent.Content = new TextBlock 
-                { 
-                    Text = "Health Monitoring View (Coming Soon)", 
-                    Foreground = System.Windows.Media.Brushes.White,
-                    FontSize = 18,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                var healthMonitorView = App.Current.Services.GetService<HealthMonitorView>();
+                MainContent.Content = healthMonitorView;
                 break;
                 
             case "Settings":
