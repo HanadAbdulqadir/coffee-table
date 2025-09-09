@@ -24,8 +24,8 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
-        // Register DbContext with factory
-        services.AddDbContextFactory<AppDbContext>(options =>
+        // Register DbContext
+        services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite("Data Source=GameTableManagerPro.db"));
 
         // Register ViewModels

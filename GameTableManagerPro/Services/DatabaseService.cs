@@ -1,6 +1,7 @@
 using GameTableManagerPro.Data;
 using GameTableManagerPro.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,16 +12,22 @@ namespace GameTableManagerPro.Services;
 
 public class DatabaseService : IDatabaseService
 {
-    private readonly IDbContextFactory<AppDbContext> _contextFactory;
+    private readonly IServiceProvider _serviceProvider;
 
-    public DatabaseService(IDbContextFactory<AppDbContext> contextFactory)
+    public DatabaseService(IServiceProvider serviceProvider)
     {
-        _contextFactory = contextFactory;
+        _serviceProvider = serviceProvider;
+    }
+
+    private async Task<AppDbContext> CreateDbContextAsync()
+    {
+        var scope = _serviceProvider.CreateAsyncScope();
+        return scope.ServiceProvider.GetRequiredService<AppDbContext>();
     }
 
     public async Task<List<GamingTable>> GetAllTablesAsync()
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.GamingTables
             .Include(g => g.DeploymentHistory)
             .OrderBy(g => g.Hostname)
@@ -29,7 +36,7 @@ public class DatabaseService : IDatabaseService
 
     public async Task<GamingTable?> GetTableByIdAsync(int id)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.GamingTables
             .Include(g => g.DeploymentHistory)
             .FirstOrDefaultAsync(g => g.Id == id);
@@ -37,7 +44,7 @@ public class DatabaseService : IDatabaseService
 
     public async Task<GamingTable?> GetTableByHostnameAsync(string hostname)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.GamingTables
             .Include(g => g.DeploymentHistory)
             .FirstOrDefaultAsync(g => g.Hostname == hostname);
@@ -47,7 +54,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             context.GamingTables.Add(table);
             await context.SaveChangesAsync();
             return true;
@@ -62,7 +69,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             context.GamingTables.Update(table);
             await context.SaveChangesAsync();
             return true;
@@ -77,7 +84,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             var table = await context.GamingTables.FindAsync(id);
             if (table != null)
             {
@@ -94,7 +101,7 @@ public class DatabaseService : IDatabaseService
 
     public async Task<List<DeploymentHistory>> GetDeploymentHistoryAsync(int tableId)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.DeploymentHistories
             .Where(d => d.GamingTableId == tableId)
             .OrderByDescending(d => d.StartTime)
@@ -105,7 +112,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             context.DeploymentHistories.Add(history);
             await context.SaveChangesAsync();
             return true;
@@ -118,19 +125,19 @@ public class DatabaseService : IDatabaseService
 
     public async Task<int> GetOnlineTablesCountAsync()
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.GamingTables.CountAsync(g => g.Status == "Online");
     }
 
     public async Task<int> GetOfflineTablesCountAsync()
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.GamingTables.CountAsync(g => g.Status == "Offline");
     }
 
     public async Task<int> GetTablesNeedingAttentionCountAsync()
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        await using var context = await CreateDbContextAsync();
         return await context.GamingTables.CountAsync(g => g.Status == "Needs Attention");
     }
 
@@ -138,7 +145,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             return await context.Database.CanConnectAsync();
         }
         catch
@@ -151,7 +158,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             await context.Database.ExecuteSqlRawAsync($"VACUUM INTO '{backupPath}'");
             return true;
         }
@@ -168,7 +175,7 @@ public class DatabaseService : IDatabaseService
             if (!File.Exists(backupPath))
                 return false;
 
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            await using var context = await CreateDbContextAsync();
             await context.Database.CloseConnectionAsync();
             
             // Close any existing connections
