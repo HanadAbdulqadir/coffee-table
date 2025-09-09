@@ -41,23 +41,16 @@ public partial class MainWindow : Window
                 MainContent.Content = dashboardView;
                 break;
                 
+            case "Deployment":
+                var deploymentView = App.Current.Services.GetService<DeploymentView>();
+                MainContent.Content = deploymentView;
+                break;
+                
             case "TableManagement":
                 // Placeholder for table management view
                 MainContent.Content = new TextBlock 
                 { 
                     Text = "Table Management View (Coming Soon)", 
-                    Foreground = System.Windows.Media.Brushes.White,
-                    FontSize = 18,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                break;
-                
-            case "Deployment":
-                // Placeholder for deployment view
-                MainContent.Content = new TextBlock 
-                { 
-                    Text = "Deployment View (Coming Soon)", 
                     Foreground = System.Windows.Media.Brushes.White,
                     FontSize = 18,
                     HorizontalAlignment = HorizontalAlignment.Center,

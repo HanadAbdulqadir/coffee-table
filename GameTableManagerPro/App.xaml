@@ -11,6 +11,9 @@
                     
                     <!-- Custom Converters -->
                     <local:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
+                    <local:LogLevelToBrushConverter x:Key="LogLevelToBrushConverter"/>
+                    <local:StepToBrushConverter x:Key="StepToBrushConverter"/>
+                    <local:ProgressToValueConverter x:Key="ProgressToValueConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
