@@ -45,6 +45,7 @@ public partial class App : Application
         // Register Services
         services.AddSingleton<IPowerShellService, PowerShellService>();
         services.AddSingleton<IDatabaseService, DatabaseService>();
+        services.AddSingleton<INavigationService, NavigationService>();
     }
 
     protected override async void OnStartup(StartupEventArgs e)
