@@ -1,0 +1,191 @@
+<UserControl x:Class="GameTableManagerPro.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:GameTableManagerPro.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=viewModels:SettingsViewModel}">
+    
+    <UserControl.Resources>
+        <!-- Styles -->
+        <Style x:Key="SettingsCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF252526"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF007ACC"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Loading Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Panel.ZIndex="1000">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20" Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="White" TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20">
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <TextBlock Text="⚙️ Settings" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                    <Button Content="🔄 Refresh" Command="{Binding LoadSettingsCommand}" 
+                            Margin="20,0,0,0" Padding="10,5" Style="{StaticResource ToolButtonStyle}"/>
+                </StackPanel>
+
+                <!-- Application Settings -->
+                <Border Style="{StaticResource SettingsCardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="APPLICATION SETTINGS" Style="{StaticResource SectionHeaderStyle}"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Theme:" Foreground="#FFCCCCCC" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox SelectedItem="{Binding IsDarkTheme, Converter={StaticResource BooleanToThemeConverter}}"
+                                      ItemsSource="{Binding AvailableThemes}" Width="120" Margin="0,0,10,0"
+                                      Style="{StaticResource ModernComboBox}"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Auto-save Interval:" Foreground="#FFCCCCCC" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox SelectedItem="{Binding AutoSaveInterval}" Width="80" Margin="0,0,10,0"
+                                      ItemsSource="{Binding SaveIntervals}" Style="{StaticResource ModernComboBox}"/>
+                            <TextBlock Text="minutes" Foreground="#FF888888" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <CheckBox IsChecked="{Binding EnableNotifications}" Content="Enable Notifications" 
+                                      Foreground="#FFCCCCCC" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding EnableAutoUpdates}" Content="Enable Auto Updates" 
+                                      Foreground="#FFCCCCCC" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- File Path Settings -->
+                <Border Style="{StaticResource SettingsCardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="FILE PATHS" Style="{StaticResource SectionHeaderStyle}"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Asset Storage:" Foreground="#FFCCCCCC" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding AssetStoragePath}" Width="250" Margin="0,0,10,0" 
+                                     Style="{StaticResource ModernTextBox}" IsReadOnly="True"/>
+                            <Button Content="Browse..." Command="{Binding BrowseAssetPathCommand}" 
+                                    Padding="8,2" Style="{StaticResource ToolButtonStyle}"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Backup Path:" Foreground="#FFCCCCCC" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding BackupPath}" Width="250" Margin="0,0,10,0" 
+                                     Style="{StaticResource ModernTextBox}" IsReadOnly="True"/>
+                            <Button Content="Browse..." Command="{Binding BrowseBackupPathCommand}" 
+                                    Padding="8,2" Style="{StaticResource ToolButtonStyle}"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Database:" Foreground="#FFCCCCCC" Width="120" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding DatabasePath}" Width="250" Margin="0,0,10,0" 
+                                     Style="{StaticResource ModernTextBox}" IsReadOnly="True"/>
+                            <Button Content="📊 Backup" Command="{Binding BackupDatabaseCommand}" 
+                                    Padding="8,2" Style="{StaticResource ToolButtonStyle}" ToolTip="Create database backup"/>
+                            <Button Content="🔄 Restore" Command="{Binding RestoreDatabaseCommand}" 
+                                    Padding="8,2" Margin="5,0,0,0" Style="{StaticResource ToolButtonStyle}" ToolTip="Restore from backup"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- User Management -->
+                <Border Style="{StaticResource SettingsCardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="USER MANAGEMENT" Style="{StaticResource SectionHeaderStyle}"/>
+                            <Button Content="➕ Add User" Command="{Binding AddNewUserCommand}" 
+                                    Margin="20,0,0,0" Padding="5,2" Style="{StaticResource ToolButtonStyle}"/>
+                        </StackPanel>
+                        
+                        <ItemsControl ItemsSource="{Binding Users}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource SettingsCardStyle}" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                                    <TextBlock Text="{Binding Username}" Foreground="White" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding Role, StringFormat='{}({0})'}" Foreground="#FFCCCCCC" Margin="10,0,0,0"/>
+                                                </StackPanel>
+                                                
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Email}" Foreground="#FFCCCCCC" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding IsActive, Converter={StaticResource BooleanToStatusConverter}}" 
+                                                               Foreground="{Binding IsActive, Converter={StaticResource StatusToBrushConverter}}"/>
+                                                </StackPanel>
+                                                
+                                                <TextBlock Text="{Binding LastLogin, StringFormat='{}Last login: {0:g}'}" Foreground="#FF888888" Margin="0,5,0,0"
+                                                           Visibility="{Binding LastLogin, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <Button Content="💾 Save" Command="{Binding DataContext.SaveUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}" Padding="5,2" Margin="0,0,5,0" FontSize="11"
+                                                        Style="{StaticResource ToolButtonStyle}" ToolTip="Save user changes"/>
+                                                
+                                                <Button Content="🗑️ Delete" Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}" Padding="5,2" FontSize="11"
+                                                        Style="{StaticResource ToolButtonStyle}" ToolTip="Delete user"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Action Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                    <Button Content="📤 Export" Command="{Binding ExportSettingsCommand}" 
+                            Padding="15,8" Style="{StaticResource ToolButtonStyle}" ToolTip="Export settings to file"/>
+                    
+                    <Button Content="📥 Import" Command="{Binding ImportSettingsCommand}" 
+                            Margin="10,0,0,0" Padding="15,8" Style="{StaticResource ToolButtonStyle}" ToolTip="Import settings from file"/>
+                    
+                    <Button Content="🔄 Reset" Command="{Binding ResetToDefaultsCommand}" 
+                            Margin="10,0,0,0" Padding="15,8" Style="{StaticResource ToolButtonStyle}" ToolTip="Reset to default settings"/>
+                    
+                    <Button Content="💾 Save All" Command="{Binding SaveSettingsCommand}" 
+                            Margin="10,0,0,0" Padding="15,8" Background="#FF4CAF50" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+
+                <!-- System Information -->
+                <Border Style="{StaticResource SettingsCardStyle}" Margin="0,20,0,0">
+                    <StackPanel>
+                        <TextBlock Text="SYSTEM INFORMATION" Style="{StaticResource SectionHeaderStyle}"/>
+                        
+                        <Button Content="ℹ️ Show System Info" Command="{Binding ShowSystemInfoCommand}" 
+                                HorizontalAlignment="Left" Padding="10,5" Style="{StaticResource ToolButtonStyle}"
+                                ToolTip="Display detailed system information"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

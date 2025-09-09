@@ -35,6 +35,7 @@ public partial class App : Application
         services.AddTransient<TableManagementViewModel>();
         services.AddTransient<HealthMonitorViewModel>();
         services.AddTransient<AssetManagementViewModel>();
+        services.AddTransient<SettingsViewModel>();
 
         // Register Views
         services.AddSingleton<MainWindow>();
@@ -43,6 +44,7 @@ public partial class App : Application
         services.AddTransient<TableView>();
         services.AddTransient<HealthMonitorView>();
         services.AddTransient<AssetManagementView>();
+        services.AddTransient<SettingsView>();
 
         // Register Services
         services.AddSingleton<IPowerShellService, PowerShellService>();

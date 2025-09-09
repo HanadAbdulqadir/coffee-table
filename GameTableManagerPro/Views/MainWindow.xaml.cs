@@ -62,15 +62,8 @@ public partial class MainWindow : Window
                 break;
                 
             case "Settings":
-                // Placeholder for settings view
-                MainContent.Content = new TextBlock 
-                { 
-                    Text = "Settings View (Coming Soon)", 
-                    Foreground = System.Windows.Media.Brushes.White,
-                    FontSize = 18,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                var settingsView = App.Current.Services.GetService<SettingsView>();
+                MainContent.Content = settingsView;
                 break;
                 
             default:
