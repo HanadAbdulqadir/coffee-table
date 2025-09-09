@@ -56,6 +56,11 @@ public partial class MainWindow : Window
                 MainContent.Content = healthMonitorView;
                 break;
                 
+            case "AssetManagement":
+                var assetManagementView = App.Current.Services.GetService<AssetManagementView>();
+                MainContent.Content = assetManagementView;
+                break;
+                
             case "Settings":
                 // Placeholder for settings view
                 MainContent.Content = new TextBlock 

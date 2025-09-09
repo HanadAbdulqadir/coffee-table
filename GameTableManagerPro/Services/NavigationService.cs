@@ -44,6 +44,7 @@ public class NavigationService : INavigationService
     public void NavigateToTableManagement() => NavigateTo("TableManagement");
     public void NavigateToDeployment() => NavigateTo("Deployment");
     public void NavigateToHealthMonitoring() => NavigateTo("HealthMonitoring");
+    public void NavigateToAssetManagement() => NavigateTo("AssetManagement");
     public void NavigateToSettings() => NavigateTo("Settings");
 
     public void GoBack()

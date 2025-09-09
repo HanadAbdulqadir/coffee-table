@@ -1,0 +1,222 @@
+<UserControl x:Class="GameTableManagerPro.Views.AssetManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:GameTableManagerPro.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=viewModels:AssetManagementViewModel}">
+    
+    <UserControl.Resources>
+        <!-- Styles -->
+        <Style x:Key="AssetCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF252526"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        
+        <Style x:Key="FilterPanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF2D2D30"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        
+        <Style x:Key="UploadPanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FF2D2D30"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+        
+        <!-- Type-specific colors -->
+        <Style x:Key="GameTypeStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF4CAF50"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        
+        <Style x:Key="EmulatorTypeStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF2196F3"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        
+        <Style x:Key="DriverTypeStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FFFF9800"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        
+        <Style x:Key="ThemeTypeStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF9C27B0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Loading Overlay -->
+        <Border Background="#80000000" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Panel.ZIndex="1000">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20" Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="White" TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" MaxWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Main Content -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="20">
+                    <!-- Header -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="📦 Asset Management" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                        <Button Content="🔄 Refresh" Command="{Binding LoadAssetsCommand}" 
+                                Margin="20,0,0,0" Padding="10,5" Style="{StaticResource ToolButtonStyle}"/>
+                    </StackPanel>
+
+                    <!-- Filter Panel -->
+                    <Border Style="{StaticResource FilterPanelStyle}">
+                        <StackPanel>
+                            <TextBlock Text="FILTER ASSETS" Foreground="#FF007ACC" FontWeight="Bold" Margin="0,0,0,10"/>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                                         Width="200" Margin="0,0,10,0" Padding="8"
+                                         PlaceholderText="Search assets..." 
+                                         Style="{StaticResource ModernTextBox}"/>
+                                
+                                <ComboBox SelectedItem="{Binding AssetTypeFilter}" Width="150" Margin="0,0,10,0"
+                                          ItemsSource="{Binding AssetTypes}"/>
+                                
+                                <Button Content="Clear Filters" Command="{Binding ClearFiltersCommand}" 
+                                        Padding="10,5" Style="{StaticResource ToolButtonStyle}"/>
+                                
+                                <TextBlock Text="{Binding FilteredAssets.Count, StringFormat='{}Showing: {0} assets'}" 
+                                           Foreground="#FFCCCCCC" Margin="20,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <Button Content="📤 Upload Asset" Command="{Binding ShowUploadDialogCommand}" 
+                                Padding="15,8" Background="#FF4CAF50" Foreground="White" FontWeight="Bold"/>
+                        
+                        <Button Content="✅ Validate All" Command="{Binding ValidateAssetsCommand}" 
+                                Margin="10,0,0,0" Padding="15,8" Style="{StaticResource ToolButtonStyle}"/>
+                    </StackPanel>
+
+                    <!-- Assets Grid -->
+                    <ItemsControl ItemsSource="{Binding FilteredAssets}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource AssetCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Asset Info -->
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" FontSize="16"/>
+                                                <TextBlock Text="{Binding Version, StringFormat='{}v{0}'}" Foreground="#FFCCCCCC" Margin="10,0,0,0"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                                <TextBlock Text="{Binding Type}" 
+                                                           Style="{Binding Type, Converter={StaticResource AssetTypeToStyleConverter}}"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Text="{Binding FileSize}" Foreground="#FFCCCCCC" Margin="0,0,10,0"/>
+                                                <TextBlock Text="{Binding UploadDate, StringFormat='{}Uploaded: {0:g}'}" Foreground="#FF888888"/>
+                                            </StackPanel>
+                                            
+                                            <TextBlock Text="{Binding Description}" Foreground="#FFCCCCCC" FontSize="11" Margin="0,5,0,0"
+                                                       TextWrapping="Wrap"/>
+                                            
+                                            <TextBlock Text="{Binding FilePath}" Foreground="#FF666666" FontSize="10" Margin="0,5,0,0"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+
+                                        <!-- Action Buttons -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <Button Content="👁️ View" Command="{Binding DataContext.ViewAssetDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Padding="5,2" Margin="0,0,5,0" FontSize="11"
+                                                    Style="{StaticResource ToolButtonStyle}" ToolTip="View details"/>
+                                            
+                                            <Button Content="🚀 Deploy" Command="{Binding DataContext.DeployAssetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Padding="5,2" Margin="0,0,5,0" FontSize="11"
+                                                    Style="{StaticResource ToolButtonStyle}" ToolTip="Deploy to all tables"/>
+                                            
+                                            <Button Content="📂 Open" Command="{Binding DataContext.OpenAssetLocationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Padding="5,2" Margin="0,0,5,0" FontSize="11"
+                                                    Style="{StaticResource ToolButtonStyle}" ToolTip="Open file location"/>
+                                            
+                                            <Button Content="🗑️ Delete" Command="{Binding DataContext.DeleteAssetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" Padding="5,2" FontSize="11"
+                                                    Style="{StaticResource ToolButtonStyle}" ToolTip="Delete asset"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty State -->
+                    <TextBlock Text="No assets found matching current filters" Foreground="#FFCCCCCC" FontStyle="Italic" 
+                               HorizontalAlignment="Center" Margin="0,20" FontSize="14"
+                               Visibility="{Binding FilteredAssets.Count, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter=Reverse}"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Upload Panel -->
+            <Border Grid.Column="1" Style="{StaticResource UploadPanelStyle}" 
+                    Visibility="{Binding ShowUploadPanel, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="📤 UPLOAD NEW ASSET" Foreground="#FF007ACC" FontWeight="Bold" FontSize="16" Margin="0,0,0,15"/>
+                        
+                        <!-- Upload Form -->
+                        <StackPanel>
+                            <TextBlock Text="Asset File *" Foreground="#FFCCCCCC" Margin="0,0,0,5"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding UploadFilePath}" Width="200" Margin="0,0,10,0" 
+                                         Style="{StaticResource ModernTextBox}" IsReadOnly="True"/>
+                                <Button Content="Browse..." Padding="8,2" 
+                                        Click="BrowseFileButton_Click"/>
+                            </StackPanel>
+                            
+                            <TextBlock Text="Asset Name *" Foreground="#FFCCCCCC" Margin="0,10,0,5"/>
+                            <TextBox Text="{Binding UploadAssetName}" Margin="0,0,0,10" 
+                                     Style="{StaticResource ModernTextBox}"/>
+                            
+                            <TextBlock Text="Asset Type" Foreground="#FFCCCCCC" Margin="0,0,0,5"/>
+                            <ComboBox SelectedItem="{Binding UploadAssetType}" 
+                                      ItemsSource="{Binding AssetTypes}" 
+                                      Margin="0,0,0,10" Style="{StaticResource ModernComboBox}"/>
+                            
+                            <TextBlock Text="Version" Foreground="#FFCCCCCC" Margin="0,0,0,5"/>
+                            <ComboBox SelectedItem="{Binding UploadVersion}" 
+                                      ItemsSource="{Binding AvailableVersions}" 
+                                      Margin="0,0,0,10" Style="{StaticResource ModernComboBox}"/>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                            <Button Content="Cancel" Command="{Binding CancelUploadCommand}" 
+                                    Padding="15,8" Margin="0,0,10,0" Style="{StaticResource ToolButtonStyle}"/>
+                            <Button Content="💾 Upload" Command="{Binding UploadAssetCommand}" 
+                                    Padding="15,8" Background="#FF4CAF50" Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
