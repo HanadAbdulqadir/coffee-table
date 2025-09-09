@@ -47,15 +47,8 @@ public partial class MainWindow : Window
                 break;
                 
             case "TableManagement":
-                // Placeholder for table management view
-                MainContent.Content = new TextBlock 
-                { 
-                    Text = "Table Management View (Coming Soon)", 
-                    Foreground = System.Windows.Media.Brushes.White,
-                    FontSize = 18,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                var tableView = App.Current.Services.GetService<TableView>();
+                MainContent.Content = tableView;
                 break;
                 
             case "HealthMonitoring":

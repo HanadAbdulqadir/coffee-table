@@ -18,6 +18,11 @@
                     <local:AlertSeverityToBrushConverter x:Key="AlertSeverityToBrushConverter"/>
                     <local:MonitoringToggleConverter x:Key="MonitoringToggleConverter"/>
                     <local:MonitoringButtonConverter x:Key="MonitoringButtonConverter"/>
+                    <local:EditModeConverter x:Key="EditModeConverter"/>
+                    <local:SaveButtonConverter x:Key="SaveButtonConverter"/>
+                    <local:SelectionToBrushConverter x:Key="SelectionToBrushConverter"/>
+                    <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+                    <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
