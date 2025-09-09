@@ -109,7 +109,7 @@ if (Test-Path $appPath) {
     Start-Process $appPath
     Write-Host "Application started! Check your taskbar for the window." -ForegroundColor Green
     Write-Host ""
-    Write-Host "If the application doesn't start, you can manually run:"
+    Write-Host "If the application doesn't start, you can manually run:" -ForegroundColor Yellow
     Write-Host $appPath -ForegroundColor Cyan
 }
 else {
