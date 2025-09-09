@@ -1,0 +1,33 @@
+# 🚀 HOW TO RUN GAMETABLE MANAGER PRO - SUPER EASY! 🚀
+
+## Option 1: Easiest Method (Recommended)
+1. **Double-click** on `QUICK_START_WINDOWS.ps1`
+2. If asked, click "Run" or "Yes" to allow PowerShell to run
+3. Wait for it to automatically install everything and start the app!
+
+## Option 2: Alternative Method  
+1. **Double-click** on `QUICK_START_WINDOWS.bat`
+2. It will guide you to the PowerShell version if needed
+
+## Option 3: Manual Method (If above don't work)
+1. Make sure you have .NET 8 installed: https://dotnet.microsoft.com/download/dotnet/8.0
+2. Open Command Prompt or PowerShell in this folder
+3. Run: `dotnet build GameTableManagerPro.sln --configuration Release`
+4. Run: `GameTableManagerPro\bin\Release\net8.0-windows\GameTableManagerPro.exe`
+
+## 🎯 What Happens Automatically:
+- ✅ Checks if .NET 8 is installed
+- ✅ Downloads and installs .NET 8 if missing  
+- ✅ Builds the application
+- ✅ Starts GameTable Manager Pro
+- ✅ Everything happens automatically!
+
+## ⚠️ Troubleshooting:
+- If PowerShell scripts are blocked, right-click the file → "Run with PowerShell"
+- You might need to allow scripts to run once: https://aka.ms/PSExecutionPolicy
+- The app requires Windows 10 or Windows 11
+
+## 📞 Need Help?
+Check the `README.md` file for more detailed instructions!
+
+## 🎉 Enjoy Your Gaming Table Management System!
